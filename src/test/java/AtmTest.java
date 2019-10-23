@@ -13,12 +13,6 @@ public class AtmTest {
     @Test
     public void atmCreation(){
         Assert.assertEquals(0,atm.getTotalCashOfAtm());
-        Assert.assertEquals(5,atm.getListOfBankNoteHolders().size());
-        Assert.assertEquals(5,atm.getListOfBankNoteHolders().get(0).bankNoteType.value);
-        Assert.assertEquals(10,atm.getListOfBankNoteHolders().get(1).bankNoteType.value);
-        Assert.assertEquals(50,atm.getListOfBankNoteHolders().get(2).bankNoteType.value);
-        Assert.assertEquals(100,atm.getListOfBankNoteHolders().get(3).bankNoteType.value);
-        Assert.assertEquals(200,atm.getListOfBankNoteHolders().get(4).bankNoteType.value);
     }
 
     @Test
@@ -30,7 +24,7 @@ public class AtmTest {
         Assert.assertEquals(MAXIMUM_AMOUNT_IN_ATM,atm.getTotalCashOfAtm());
     }
     @Test
-    public void areMoneyWithdrawn(){
+    public void areMoneyWithdraw(){
         //given
         atm.fillEachHolder();
         //when
@@ -40,7 +34,7 @@ public class AtmTest {
     }
 
     @Test
-    public void impossibleWithdraw(){
+    public void impossibleWithdraws(){
         //when
         atm.fillEachHolder();
         atm.withdrawCash(MAXIMUM_AMOUNT_IN_ATM -500);
@@ -48,8 +42,6 @@ public class AtmTest {
         Assert.assertFalse(atm.withdrawCash(600));
         Assert.assertFalse(atm.withdrawCash(0));
         Assert.assertFalse(atm.withdrawCash(2));
-        Assert.assertTrue(atm.withdrawCash(5));
-        Assert.assertEquals(495,atm.getTotalCashOfAtm());
 
         //when
         atm.fillEachHolder();
@@ -66,13 +58,4 @@ public class AtmTest {
         //then
         Assert.assertFalse(atm.withdrawCash(20));
     }
-
-    @Test
-    public void getsRightHolder(){
-        //when
-        BankNoteHolder testHolder = atm.getHolder(BankNoteType.FIFTY);
-        //then
-        Assert.assertEquals(BankNoteType.FIFTY, testHolder.bankNoteType);
-    }
-
 }

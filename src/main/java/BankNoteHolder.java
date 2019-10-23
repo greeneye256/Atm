@@ -1,46 +1,99 @@
-abstract class BankNoteHolder {
-    private BankNoteHolder bankNoteHolder;
-    BankNoteType bankNoteType;
-    int numberOfBankNotes;
+public abstract class BankNoteHolder {
+
+    private BankNoteHolder nextBankNoteHolder;
+
+    private int numberOfBankNotes;
+
     private static final int MAXOFBANKNOTES = 200;
 
     BankNoteHolder(BankNoteHolder bankNoteHolder) {
-        this.bankNoteHolder = bankNoteHolder;
+        this.nextBankNoteHolder = bankNoteHolder;
     }
 
-    void fillBankNoteHolder() {
-        this.numberOfBankNotes = MAXOFBANKNOTES;
+    public int getValue() {
+
+        return numberOfBankNotes * getBankNoteType().value + (nextBankNoteHolder == null ? 0 : nextBankNoteHolder.getValue());
     }
 
-    void withdrawCash(int money) {
-        if (this.numberOfBankNotes == 0) {
-            this.bankNoteHolder.withdrawCash(money);
-            return;
-        }
-        if (money % bankNoteType.value != 0) {
-            if (money / bankNoteType.value == 0) {
-                this.bankNoteHolder.withdrawCash(money);
-                return;
+    public int getNumberOfBankNotes() {
+        return numberOfBankNotes;
+    }
+
+    public abstract BankNoteType getBankNoteType();
+
+    boolean withdrawCash(int money) {
+        int moneyInHolder = this.numberOfBankNotes * getBankNoteType().value;
+        int preparedBankNotes = 0;
+        if (moneyInHolder == 0) {
+            if (nextBankNoteHolder == null) {
+                return false;
+            } else {
+                nextBankNoteHolder.withdrawCash(money);
             }
-            System.out.println(money / bankNoteType.value + " * " + bankNoteType.value);
-            this.numberOfBankNotes -= money / bankNoteType.value;
-            this.bankNoteHolder.withdrawCash(money % bankNoteType.value);
-            return;
+
+        } else {
+            if (money % getBankNoteType().value == 0){
+                if (moneyInHolder - money >= 0){
+                    System.out.println(money/getBankNoteType().value + " * " + getBankNoteType().value);
+                    this.numberOfBankNotes -= money / getBankNoteType().value;
+                    return true;
+                }
+                else {
+                    preparedBankNotes = numberOfBankNotes;
+                    if (nextBankNoteHolder == null){return false;}
+                    if (nextBankNoteHolder.withdrawCash(money - (preparedBankNotes * getBankNoteType().value))){
+                        if (preparedBankNotes != 0){
+                            System.out.println(preparedBankNotes + " * " + getBankNoteType().value);
+                        }
+                        this.numberOfBankNotes = 0;
+                        return true;
+                    }
+
+                }
+            }
+            else {
+                if (this.numberOfBankNotes < money / getBankNoteType().value){
+                    preparedBankNotes = this.numberOfBankNotes;
+                    if (nextBankNoteHolder.withdrawCash(money - (preparedBankNotes * getBankNoteType().value))){
+                        if (preparedBankNotes != 0){
+                            System.out.println(preparedBankNotes + " * " + getBankNoteType().value);
+                        }
+                        this.numberOfBankNotes = 0;
+                        return true;
+                    }
+                }
+                else {
+                    preparedBankNotes = money / getBankNoteType().value;
+                    if (nextBankNoteHolder.withdrawCash(money % getBankNoteType().value)){
+                        if (preparedBankNotes != 0){
+                            System.out.println(preparedBankNotes + " * " + getBankNoteType().value);
+                        }
+                        this.numberOfBankNotes -= preparedBankNotes;
+                        return true;
+                    }
+                }
+            }
         }
-        System.out.println(money / bankNoteType.value + " * " + bankNoteType.value);
-        this.numberOfBankNotes -= money / bankNoteType.value;
+        return false;
+
     }
 
-    boolean areEnoughMoney(int money) {
-        if (money % bankNoteType.value == 0 && numberOfBankNotes * bankNoteType.value >= money) {
-            return true;
+
+    public void fillBankNoteHolder() {
+
+        this.numberOfBankNotes = MAXOFBANKNOTES;
+        if (nextBankNoteHolder != null) {
+            nextBankNoteHolder.fillBankNoteHolder();
         }
-        if (bankNoteHolder == null) {
-            return false;
-        }
-        if (numberOfBankNotes * bankNoteType.value > money){
-            return bankNoteHolder.areEnoughMoney(money % bankNoteType.value);
-        }
-        else return bankNoteHolder.areEnoughMoney(money - (numberOfBankNotes * bankNoteType.value));
     }
+
+    public BankNoteHolder getBankNoteHolder(BankNoteType bankNoteType) {
+        if (this.getBankNoteType() == bankNoteType) {
+            return this;
+        } else {
+            return nextBankNoteHolder.getBankNoteHolder(bankNoteType);
+        }
+    }
+
+
 }

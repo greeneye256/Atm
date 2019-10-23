@@ -1,7 +1,14 @@
 class BankNoteHolderOf100 extends BankNoteHolder {
 
+    private BankNoteType bankNoteType;
+
     BankNoteHolderOf100(BankNoteHolder bankNoteHolder) {
         super(bankNoteHolder);
-        this.bankNoteType = BankNoteType.ONEHUNDRED;
+        bankNoteType = BankNoteType.ONEHUNDRED;
+    }
+
+    @Override
+    public BankNoteType getBankNoteType() {
+        return bankNoteType;
     }
 }
