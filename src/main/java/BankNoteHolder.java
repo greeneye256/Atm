@@ -15,69 +15,37 @@ public abstract class BankNoteHolder {
         return numberOfBankNotes * getBankNoteType().value + (nextBankNoteHolder == null ? 0 : nextBankNoteHolder.getValue());
     }
 
-    public int getNumberOfBankNotes() {
-        return numberOfBankNotes;
-    }
-
     public abstract BankNoteType getBankNoteType();
 
-    boolean withdrawCash(int money) {
-        int moneyInHolder = this.numberOfBankNotes * getBankNoteType().value;
-        int preparedBankNotes = 0;
-        if (moneyInHolder == 0) {
-            if (nextBankNoteHolder == null) {
-                return false;
-            } else {
-                nextBankNoteHolder.withdrawCash(money);
-            }
-
-        } else {
-            if (money % getBankNoteType().value == 0){
-                if (moneyInHolder - money >= 0){
-                    System.out.println(money/getBankNoteType().value + " * " + getBankNoteType().value);
-                    this.numberOfBankNotes -= money / getBankNoteType().value;
-                    return true;
-                }
-                else {
-                    preparedBankNotes = numberOfBankNotes;
-                    if (nextBankNoteHolder == null){return false;}
-                    if (nextBankNoteHolder.withdrawCash(money - (preparedBankNotes * getBankNoteType().value))){
-                        if (preparedBankNotes != 0){
-                            System.out.println(preparedBankNotes + " * " + getBankNoteType().value);
-                        }
-                        this.numberOfBankNotes = 0;
-                        return true;
-                    }
-
-                }
-            }
-            else {
-                if (this.numberOfBankNotes < money / getBankNoteType().value){
-                    preparedBankNotes = this.numberOfBankNotes;
-                    if (nextBankNoteHolder.withdrawCash(money - (preparedBankNotes * getBankNoteType().value))){
-                        if (preparedBankNotes != 0){
-                            System.out.println(preparedBankNotes + " * " + getBankNoteType().value);
-                        }
-                        this.numberOfBankNotes = 0;
-                        return true;
-                    }
-                }
-                else {
-                    preparedBankNotes = money / getBankNoteType().value;
-                    if (nextBankNoteHolder.withdrawCash(money % getBankNoteType().value)){
-                        if (preparedBankNotes != 0){
-                            System.out.println(preparedBankNotes + " * " + getBankNoteType().value);
-                        }
-                        this.numberOfBankNotes -= preparedBankNotes;
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-
+    private void printReturnedBankNotes(int numberOfReturnedBankNotes) {
+        System.out.println(numberOfReturnedBankNotes + " * " + getBankNoteType());
     }
 
+    boolean withdrawCash(int money) {
+        int bankNoteValue = getBankNoteType().value;
+        int requiredBankNotes = money / bankNoteValue;
+        int preparedBankNotes = (requiredBankNotes > this.numberOfBankNotes) ? this.numberOfBankNotes : requiredBankNotes;
+        int moneyInHolder = this.numberOfBankNotes * bankNoteValue;
+
+        if (moneyInHolder == 0 || requiredBankNotes == 0) {
+            return (nextBankNoteHolder != null) && nextBankNoteHolder.withdrawCash(money);
+        }
+
+        if (money % bankNoteValue == 0 && moneyInHolder - money >= 0) {
+            this.numberOfBankNotes -= requiredBankNotes;
+            printReturnedBankNotes(requiredBankNotes);
+            return true;
+        }
+
+        if (nextBankNoteHolder == null) {return false;}
+
+        if (nextBankNoteHolder.withdrawCash(money - preparedBankNotes * bankNoteValue)) {
+            this.numberOfBankNotes -= preparedBankNotes;
+            printReturnedBankNotes(preparedBankNotes);
+            return true;
+        }
+        return false;
+    }
 
     public void fillBankNoteHolder() {
 
@@ -94,6 +62,4 @@ public abstract class BankNoteHolder {
             return nextBankNoteHolder.getBankNoteHolder(bankNoteType);
         }
     }
-
-
 }
