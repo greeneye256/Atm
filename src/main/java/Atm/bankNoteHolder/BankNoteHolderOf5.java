@@ -1,8 +1,10 @@
-class BankNoteHolderOf5 extends BankNoteHolder {
+package Atm.bankNoteHolder;
+
+public class BankNoteHolderOf5 extends BankNoteHolder {
 
     private BankNoteType bankNoteType;
 
-    BankNoteHolderOf5(BankNoteHolder bankNoteHolder) {
+    public BankNoteHolderOf5(BankNoteHolder bankNoteHolder) {
         super(bankNoteHolder);
         bankNoteType = BankNoteType.FIVE;
     }
